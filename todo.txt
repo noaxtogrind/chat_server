@@ -1,0 +1,11 @@
+< short >
+
+rename chat_server/sup as tcp_server/sup
+new top level chat_sup (tcp_sup, pid_server)
+abstract chat_controller from tcp_server
+add mfa parsing to chat_controller
+new pid_server; add to supervisor
+
+testing
+rebar
+
