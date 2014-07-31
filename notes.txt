@@ -1,0 +1,7 @@
+< next product >
+
+joeel's bank + http server + ec2
+start with echo server
+convert tcp interface to http (http_bin; see erlang+otp)
+add top level supervisor, bank etc
+deploy to ec2
