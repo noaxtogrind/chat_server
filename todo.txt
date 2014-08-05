@@ -1,6 +1,6 @@
 < short >
 
-chat_controller mfa parsing
+basic chat protocol
 
 new gen_server to maintain list of client pids
 chat broadcast behaviour
