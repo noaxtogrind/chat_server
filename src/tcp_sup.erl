@@ -1,4 +1,4 @@
--module(chat_sup).
+-module(tcp_sup).
 
 -behaviour(supervisor).
 
@@ -16,8 +16,8 @@ start_child() ->
 
 init([Port]) ->
     {ok, LSock} = gen_tcp:listen(Port, [{active, false}]),
-    Server = {chat_server, {chat_server, start_link, [LSock]},
-	      temporary, brutal_kill, worker, [chat_server]},
+    Server = {tcp_server, {tcp_server, start_link, [LSock]},
+	      temporary, brutal_kill, worker, [tcp_server]},
     Children = [Server],
     RestartStrategy = {simple_one_for_one, 0, 1},
     spawn_link(fun() ->		       

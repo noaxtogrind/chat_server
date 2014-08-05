@@ -1,4 +1,4 @@
--module(chat_server).
+-module(tcp_server).
 
 -behaviour(gen_server).
 
@@ -42,7 +42,7 @@ handle_info(trigger, #state{lsock = LSock} = State) ->
     {ok, Socket} = gen_tcp:accept(LSock),
     inet:setopts(Socket, [{active, once}]),
     io:format("~p accepted~n", [Socket]),
-    chat_sup:start_child(),
+    tcp_sup:start_child(),
     {noreply, State}.
 
 terminate(_Reason, _State) ->
