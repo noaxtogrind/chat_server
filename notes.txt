@@ -1,7 +1,6 @@
-< next product >
+< tcp controller design 5/8/14 >
 
-joeel's bank + http server + ec2
-start with echo server
-convert tcp interface to http (http_bin; see erlang+otp)
-add top level supervisor, bank etc
-deploy to ec2
+tcp controller design is extremely limited; in more sophisticated pattern you might have:
+- state arg passed from supervisor with module name
+- controller:handle() returning value for updating of gen_server state
+- controller exposing accept, disconnect handlers to gen_server
