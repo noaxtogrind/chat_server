@@ -1,8 +1,10 @@
 < short >
 
-abstract chat_controller from tcp_server
-add mfa parsing to chat_controller
-new pid_server; add to supervisor
+chat_controller mfa parsing
+
+new gen_server to maintain list of client pids
+chat broadcast behaviour
+
 
 
 
