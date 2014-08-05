@@ -7,7 +7,7 @@
 -define(PORT, 1066).
 
 start(_StartType, _StartArgs) ->
-    case tcp_sup:start_link(?PORT) of
+    case chat_sup:start_link(?PORT) of
         {ok, Pid} ->
             {ok, Pid};
         Other ->
