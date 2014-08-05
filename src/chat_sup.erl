@@ -8,11 +8,13 @@
 
 -define(SERVER, ?MODULE).
 
-start_link(Port) ->
-    supervisor:start_link({local, ?SERVER}, ?MODULE, [Port]).
+-define(CONTROLLER, chat_controller).
 
-init([Port]) ->
-    TCPSup = {tcp_sup, {tcp_sup, start_link, [Port]},
+start_link(Port) ->
+    supervisor:start_link({local, ?SERVER}, ?MODULE, [Port, ?CONTROLLER]).
+
+init([Port, Mod]) ->
+    TCPSup = {tcp_sup, {tcp_sup, start_link, [Port, Mod]},
 	      permanent, 10500, supervisor, [tcp_sup]},
     Children = [TCPSup],
     RestartStrategy = {one_for_one, 6, 3600},

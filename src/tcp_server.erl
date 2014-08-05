@@ -2,7 +2,7 @@
 
 -behaviour(gen_server).
 
--export([start_link/1]).
+-export([start_link/2]).
 
 -export([init/1, 
 	 handle_call/3, 
@@ -11,15 +11,15 @@
 	 terminate/2, 
 	 code_change/3]).
 
--record(state, {lsock}).
+-record(state, {lsock, mod}).
 
-start_link(LSock) ->
-    gen_server:start_link(?MODULE, [LSock], []).
+start_link(LSock, Mod) ->
+    gen_server:start_link(?MODULE, [LSock, Mod], []).
 
-init([LSock]) ->
+init([LSock, Mod]) ->
     io:format("Initialising ~p~n", [self()]),
     erlang:send_after(0, self(), trigger),
-    {ok, #state{lsock = LSock}}.
+    {ok, #state{lsock = LSock, mod = Mod}}.
 
 handle_call(Msg, _From, State) ->
     {reply, {ok, Msg}, State}.
