@@ -1,9 +1,8 @@
 < short >
 
-new gen_server to maintain list of client pids
+add dict semantics to name_server
+name_server add/delete/list functionality
 
-basic chat protocol
-chat broadcast behaviour
 
 
 
