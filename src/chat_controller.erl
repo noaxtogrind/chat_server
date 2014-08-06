@@ -16,19 +16,21 @@ clean_newline(Input) ->
 	    list_to_binary(Input)
     end.
 
-handle(Socket, RawData, _Args) ->
+handle(Socket, RawData, Args) ->
     case RawData of
 	?BLANK ->
-	    void;
+	    Args;
 	_ ->
 	    CleanData=clean_newline(RawData),
-	    Resp=case re:split(CleanData, "\\:\\s*") of 
-		     [?CONNECT, Name] ->
-			 io_lib:fwrite("Connected as ~p~n", [binary_to_list(Name)]);
-		     [?QUIT] ->
-			 "Quit!\n";
-		     _ ->
-			 "Unknown :-(\n"
-		 end,
-	    gen_tcp:send(Socket, Resp)
+	    case re:split(CleanData, "\\:\\s*") of 
+		[?CONNECT, Name] ->
+		    Resp=io_lib:fwrite("Connected as ~p~n", [binary_to_list(Name)]),
+		    gen_tcp:send(Socket, Resp);
+		[?QUIT] ->
+		    Resp="Quit!\n",
+		    gen_tcp:send(Socket, Resp);
+		_ ->
+		    Resp="Unknown :-(\n",
+		    gen_tcp:send(Socket, Resp)
+	    end
     end.
