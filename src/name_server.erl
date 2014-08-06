@@ -6,7 +6,8 @@
 
 %% API
 
--export([speak/0]).
+-export([add/2,
+	 list/0]).
 
 %% gen_server callbacks
 
@@ -21,8 +22,11 @@
 
 %% API
 
-speak() ->
-    gen_server:cast(?SERVER, speak).
+add(Name, Pid) ->
+    gen_server:call(?SERVER, {add, Name, Pid}).
+
+list() ->
+    gen_server:cast(?SERVER, list).
 
 %% gen_server callbacks
 
@@ -34,12 +38,12 @@ init([]) ->
     Users = dict:new(),
     {ok, Users}.
 
-handle_call(_Request, _From, Users) ->
+handle_call({add, Name, Pid}, _From, Users) ->
+    NewUsers = dict:append(Name, Pid, Users),
     Reply = ok,
-    {reply, Reply, Users}.
+    {reply, Reply, NewUsers}.
 
-handle_cast(speak, Users) ->
-    %% io:format("Hello World from name_server!~n"),
+handle_cast(list, Users) ->
     io:format("~p~n", [dict:to_list(Users)]),
     {noreply, Users}.
 
