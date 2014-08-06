@@ -2,7 +2,7 @@
 
 -behaviour(gen_server).
 
--export([start_link/2]).
+-export([start_link/3]).
 
 -export([init/1, 
 	 handle_call/3, 
@@ -11,15 +11,15 @@
 	 terminate/2, 
 	 code_change/3]).
 
--record(state, {lsock, mod}).
+-record(state, {lsock, mod, args}).
 
-start_link(LSock, Mod) ->
-    gen_server:start_link(?MODULE, [LSock, Mod], []).
+start_link(LSock, Mod, Args) ->
+    gen_server:start_link(?MODULE, [LSock, Mod, Args], []).
 
-init([LSock, Mod]) ->
+init([LSock, Mod, Args]) ->
     io:format("Initialising tcp_server ~p~n", [self()]),
     erlang:send_after(0, self(), trigger),
-    {ok, #state{lsock = LSock, mod = Mod}}.
+    {ok, #state{lsock = LSock, mod = Mod, args = Args}}.
 
 handle_call(Msg, _From, State) ->
     {reply, {ok, Msg}, State}.
@@ -27,10 +27,10 @@ handle_call(Msg, _From, State) ->
 handle_cast(stop, State) ->
     {stop, normal, State}.
 
-handle_info({tcp, Socket, RawData},  #state{mod = Mod} = State) ->
+handle_info({tcp, Socket, RawData},  #state{mod = Mod, args = Args} = State) ->
     %% io:format("Received '~p' from ~p~n", [RawData, Socket]),
     inet:setopts(Socket, [{active, once}]), 
-    Mod:handle(Socket, RawData),
+    Mod:handle(Socket, RawData, Args),
     {noreply, State};
 handle_info({tcp_closed, Socket}, State) ->
     io:format("~p closed~n", [Socket]),
