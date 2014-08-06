@@ -1,7 +1,6 @@
 < short >
 
-split echo message
-add chat protocol semantics
+[how does quit know name ?]
 
 testing
 rebar
