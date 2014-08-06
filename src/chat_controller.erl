@@ -19,7 +19,7 @@ clean_newline(Input) ->
 handle(RawData) ->
     case RawData of
 	?BLANK ->
-	    "No data received\n";	
+	    void;
 	_ ->
 	    CleanData=clean_newline(RawData),
 	    case re:split(CleanData, "\\:\\s*") of 
