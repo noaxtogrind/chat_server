@@ -30,7 +30,8 @@ handle_cast(stop, State) ->
 handle_info({tcp, Socket, RawData},  #state{mod = Mod} = State) ->
     io:format("Received '~p' from ~p~n", [RawData, Socket]),
     inet:setopts(Socket, [{active, once}]), 
-    Mod:handle(Socket, RawData),
+    Resp = Mod:handle(RawData),
+    gen_tcp:send(Socket, Resp),
     {noreply, State};
 handle_info({tcp_closed, Socket}, State) ->
     io:format("~p closed~n", [Socket]),

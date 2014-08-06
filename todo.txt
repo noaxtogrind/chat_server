@@ -1,8 +1,8 @@
 < short >
 
-basic chat protocol
-
 new gen_server to maintain list of client pids
+
+basic chat protocol
 chat broadcast behaviour
 
 
