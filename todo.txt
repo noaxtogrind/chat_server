@@ -1,7 +1,5 @@
 < short >
 
-[how does quit know name ?]
-
 testing
 rebar
 
