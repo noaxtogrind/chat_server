@@ -1,7 +1,11 @@
 < short >
 
-XXX
+clean echo message
+split echo message
+add chat protocol semantics
 
+testing
+rebar
 
 
 
