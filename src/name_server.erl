@@ -19,8 +19,6 @@
 
 -define(SERVER, ?MODULE). 
 
--record(state, {}).
-
 %% API
 
 speak() ->
@@ -33,22 +31,23 @@ start_link() ->
 
 init([]) ->
     io:format("Initialising name_server ~p~n", [self()]),
-    {ok, #state{}}.
+    Users = dict:new(),
+    {ok, Users}.
 
-handle_call(_Request, _From, State) ->
+handle_call(_Request, _From, Users) ->
     Reply = ok,
-    {reply, Reply, State}.
+    {reply, Reply, Users}.
 
-handle_cast(speak, State) ->
+handle_cast(speak, Users) ->
     io:format("Hello World from name_server!~n"),
-    {noreply, State}.
+    {noreply, Users}.
 
-handle_info(_Info, State) ->
-    {noreply, State}.
+handle_info(_Info, Users) ->
+    {noreply, Users}.
 
-terminate(_Reason, _State) ->
+terminate(_Reason, _Users) ->
     ok.
 
-code_change(_OldVsn, State, _Extra) ->
-    {ok, State}.
+code_change(_OldVsn, Users, _Extra) ->
+    {ok, Users}.
 
