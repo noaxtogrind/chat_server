@@ -1,8 +1,10 @@
 < short >
 
-complete chatting protocols
+broadcast to other users on connection, deletion
+private, public messages
 
 testing
+socket client
 rebar
 
 

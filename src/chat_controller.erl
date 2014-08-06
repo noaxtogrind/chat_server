@@ -8,6 +8,42 @@
 
 -define(QUIT, <<"QUIT">>).
 
+connect(Socket, User, Name) ->
+    case User#user.name of
+	?NULL ->
+	    case name_server:add(Name, Socket) of
+		ok ->
+		    gen_tcp:send(Socket, "Connected\n"),
+		    User#user{name=Name};
+		{error, ErrMsg} ->
+		    gen_tcp:send(Socket, ErrMsg++"\n"),
+		    User
+	    end;
+	_ ->
+	    gen_tcp:send(Socket, "Already connected\n"),
+	    User
+    end.
+
+quit(Socket, User) ->
+    case User#user.name of
+	?NULL ->
+	    gen_tcp:send(Socket, "Not connected\n"),
+	    User;
+	Name ->
+	    case name_server:remove(Name) of
+		ok ->
+		    gen_tcp:send(Socket, "Disconnected\n"),
+		    User#user{name=?NULL};
+		{error, ErrMsg} ->
+		    gen_tcp:send(Socket, ErrMsg++"\n"),
+		    User    
+	    end
+    end.
+
+unhandled(Socket, User) ->
+    gen_tcp:send(Socket, "Unhandled\n"),
+    User.
+
 clean_newline(Input) ->
     case re:replace(Input, "\\r?\\n$", "") of
 	[Output, []] ->
@@ -24,37 +60,10 @@ handle(Socket, RawData, User) ->
 	    CleanData=clean_newline(RawData),
 	    case re:split(CleanData, "\\:\\s*") of 
 		[?CONNECT, Name] ->
-		    case User#user.name of
-			?NULL ->
-			    case name_server:add(Name, Socket) of
-				ok ->
-				    gen_tcp:send(Socket, "Connected\n"),
-				    User#user{name=Name};
-				{error, ErrMsg} ->
-				    gen_tcp:send(Socket, ErrMsg++"\n"),
-				    User
-			    end;
-			_ ->
-			    gen_tcp:send(Socket, "Already connected\n"),
-			    User
-		    end;
+		    connect(Socket, User, Name);
 		[?QUIT] ->
-		    case User#user.name of
-			?NULL ->
-			    gen_tcp:send(Socket, "Not connected\n"),
-			    User;
-			Name ->
-			    case name_server:remove(Name) of
-				ok ->
-				    gen_tcp:send(Socket, "Disconnected\n"),
-				    User#user{name=?NULL};
-				{error, ErrMsg} ->
-				    gen_tcp:send(Socket, ErrMsg++"\n"),
-				    User    
-			    end
-		    end;
+		    quit(Socket, User);
 		_ ->
-		    gen_tcp:send(Socket, "Unhandled\n"),
-		    User
+		    unhandled(Socket, User)
 	    end
     end.
