@@ -1,6 +1,6 @@
 -module(chat_sup).
 
--include("chat.hrl").
+-include("chat_app.hrl").
 
 -behaviour(supervisor).
 

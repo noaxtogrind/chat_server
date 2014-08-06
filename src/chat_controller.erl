@@ -1,6 +1,6 @@
 -module(chat_controller).
 
--include("chat.hrl").
+-include("chat_app.hrl").
 
 -export([handle/3]).
 
