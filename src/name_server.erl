@@ -26,7 +26,7 @@ add(Name, Pid) ->
     gen_server:call(?SERVER, {add, Name, Pid}).
 
 list() ->
-    gen_server:cast(?SERVER, list).
+    gen_server:call(?SERVER, list).
 
 %% gen_server callbacks
 
@@ -41,11 +41,13 @@ init([]) ->
 handle_call({add, Name, Pid}, _From, Users) ->
     NewUsers = dict:append(Name, Pid, Users),
     Reply = ok,
-    {reply, Reply, NewUsers}.
+    {reply, Reply, NewUsers};
+handle_call(list, _From, Users) ->
+    Reply = dict:to_list(Users),
+    {reply, Reply, Users}.
 
-handle_cast(list, Users) ->
-    io:format("~p~n", [dict:to_list(Users)]),
-    {noreply, Users}.
+handle_cast(_Msg, State) ->
+    {noreply, State}.
 
 handle_info(_Info, Users) ->
     {noreply, Users}.
