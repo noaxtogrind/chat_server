@@ -4,6 +4,12 @@
 
 -export([start_link/0]).
 
+%% API
+
+-export([speak/0]).
+
+%% gen_server callbacks
+
 -export([init/1, 
 	 handle_call/3, 
 	 handle_cast/2, 
@@ -14,6 +20,13 @@
 -define(SERVER, ?MODULE). 
 
 -record(state, {}).
+
+%% API
+
+speak() ->
+    gen_server:cast(?SERVER, speak).
+
+%% gen_server callbacks
 
 start_link() ->
     gen_server:start_link({local, ?SERVER}, ?MODULE, [], []).
@@ -26,7 +39,8 @@ handle_call(_Request, _From, State) ->
     Reply = ok,
     {reply, Reply, State}.
 
-handle_cast(_Msg, State) ->
+handle_cast(speak, State) ->
+    io:format("Hello World from name_server!~n"),
     {noreply, State}.
 
 handle_info(_Info, State) ->
