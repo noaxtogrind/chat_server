@@ -1,10 +1,11 @@
 < short >
 
-private, public messages
+public, private messages
 
+rebar
 testing
 socket client
-rebar
+
 
 
 

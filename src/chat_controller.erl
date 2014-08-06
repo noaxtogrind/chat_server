@@ -12,10 +12,7 @@ send(Socket, Msg) ->
     gen_tcp:send(Socket, Msg++"\n").
     
 broadcast(Msg) ->
-    lists:map(fun({_, [Socket]}) -> 
-		      send(Socket, Msg)
-	      end,
-	      name_server:list()).
+    lists:map(fun({_, [Socket]}) -> send(Socket, Msg) end, name_server:list()).
 
 connect(Socket, User, Name) ->
     case User#user.name of
@@ -50,10 +47,6 @@ quit(Socket, User) ->
 	    end
     end.
 
-unhandled(Socket, User) ->
-    send(Socket, "Unhandled"),
-    User.
-
 handle(Socket, RawData, User) ->
     case RawData of
 	?BLANK ->
@@ -66,6 +59,7 @@ handle(Socket, RawData, User) ->
 		[?QUIT] ->
 		    quit(Socket, User);
 		_ ->
-		    unhandled(Socket, User)
+		    send(Socket, "Unhandled"),
+		    User
 	    end
     end.
