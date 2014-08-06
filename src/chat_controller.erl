@@ -6,6 +6,8 @@
 
 -define(CONNECT, <<"CONNECT">>).
 
+-define(SAY, <<"SAY">>).
+
 -define(QUIT, <<"QUIT">>).
 
 send(Socket, Msg) ->
@@ -27,6 +29,16 @@ connect(Socket, User, Name) ->
 	    end;
 	_ ->
 	    send(Socket, "Already connected"),
+	    User
+    end.
+
+say(Socket, User, Msg) ->
+    case User#user.name of
+	?NULL ->
+	    send(Socket, "Not connected"),
+	    User;
+	Name ->
+	    broadcast(io_lib:fwrite("~p says ~p", [binary_to_list(Name), binary_to_list(Msg)])),   
 	    User
     end.
 
@@ -56,6 +68,8 @@ handle(Socket, RawData, User) ->
 	    case re:split(CleanData, "\\:\\s*") of 
 		[?CONNECT, Name] ->
 		    connect(Socket, User, Name);
+		[?SAY, Msg] ->
+		    say(Socket, User, Msg);
 		[?QUIT] ->
 		    quit(Socket, User);
 		_ ->
