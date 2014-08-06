@@ -30,6 +30,8 @@ list() ->
 
 %% gen_server callbacks
 
+%% NB server is started with name_server name
+
 start_link() ->
     gen_server:start_link({local, ?SERVER}, ?MODULE, [], []).
 
@@ -39,8 +41,12 @@ init([]) ->
     {ok, Users}.
 
 handle_call({add, Name, Pid}, _From, Users) ->
-    NewUsers = dict:append(Name, Pid, Users),
-    Reply = ok,
+    {Reply, NewUsers} = case dict:is_key(Name, Users) of
+			    false ->
+				{ok, dict:append(Name, Pid, Users)};
+			    true ->
+				{{error, "Name exists"}, Users}
+			end,
     {reply, Reply, NewUsers};
 handle_call(list, _From, Users) ->
     Reply = dict:to_list(Users),
