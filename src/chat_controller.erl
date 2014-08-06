@@ -4,9 +4,11 @@
 
 -define(BLANK, "\r\n").
 
-%% http://stackoverflow.com/questions/853296/remove-whitespace-using-erlang-regex
+-define(CONNECT, <<"CONNECT">>).
 
-clean(Input) ->
+-define(QUIT, <<"QUIT">>).
+
+clean_newline(Input) ->
     case re:replace(Input, "\\r?\\n$", "") of
 	[Output, []] ->
 	    Output;
@@ -19,6 +21,13 @@ handle(RawData) ->
 	?BLANK ->
 	    "No data received\n";	
 	_ ->
-	    CleanData = clean(RawData),
-	    io_lib:fwrite("You sent: ~p~n", [binary_to_list(CleanData)])
+	    CleanData=clean_newline(RawData),
+	    case re:split(CleanData, "\\:\\s*") of 
+		[?CONNECT, Name] ->
+		    io_lib:fwrite("Connected as ~p~n", [binary_to_list(Name)]);
+		[?QUIT] ->
+		    "Quit!\n";
+		_ ->
+		    "Unknown :-(\n"
+	    end
     end.
