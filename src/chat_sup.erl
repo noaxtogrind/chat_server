@@ -13,7 +13,7 @@
 -define(TCP_CONTROLLER, chat_controller).
 
 start_link(Port) ->
-    supervisor:start_link({local, ?SERVER}, ?MODULE, [Port, ?TCP_CONTROLLER, #user{name=null}]).
+    supervisor:start_link({local, ?SERVER}, ?MODULE, [Port, ?TCP_CONTROLLER, #user{name=?NULL}]).
 
 init([Port, Mod, Args]) ->
     NameServer = {name_server, {name_server, start_link, []},

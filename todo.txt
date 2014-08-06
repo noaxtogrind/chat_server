@@ -1,7 +1,5 @@
 < short >
 
-include null, blank in headers
-
 complete chatting protocols
 
 testing
