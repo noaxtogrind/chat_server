@@ -8,56 +8,58 @@
 
 -define(QUIT, <<"QUIT">>).
 
+send(Socket, Msg) ->
+    gen_tcp:send(Socket, Msg++"\n").
+    
+broadcast(Msg) ->
+    lists:map(fun({_, [Socket]}) -> 
+		      send(Socket, Msg)
+	      end,
+	      name_server:list()).
+
 connect(Socket, User, Name) ->
     case User#user.name of
 	?NULL ->
 	    case name_server:add(Name, Socket) of
 		ok ->
-		    gen_tcp:send(Socket, "Connected\n"),
+		    broadcast(io_lib:fwrite("~p connected", [binary_to_list(Name)])),
 		    User#user{name=Name};
 		{error, ErrMsg} ->
-		    gen_tcp:send(Socket, ErrMsg++"\n"),
+		    send(Socket, ErrMsg),
 		    User
 	    end;
 	_ ->
-	    gen_tcp:send(Socket, "Already connected\n"),
+	    send(Socket, "Already connected"),
 	    User
     end.
 
 quit(Socket, User) ->
     case User#user.name of
 	?NULL ->
-	    gen_tcp:send(Socket, "Not connected\n"),
+	    send(Socket, "Not connected"),
 	    User;
 	Name ->
 	    case name_server:remove(Name) of
 		ok ->
-		    gen_tcp:send(Socket, "Disconnected\n"),
+		    broadcast(io_lib:fwrite("~p disconnected", [binary_to_list(Name)])),
+		    send(Socket, "Disconnected"),		    
 		    User#user{name=?NULL};
 		{error, ErrMsg} ->
-		    gen_tcp:send(Socket, ErrMsg++"\n"),
+		    send(Socket, ErrMsg),
 		    User    
 	    end
     end.
 
 unhandled(Socket, User) ->
-    gen_tcp:send(Socket, "Unhandled\n"),
+    send(Socket, "Unhandled"),
     User.
-
-clean_newline(Input) ->
-    case re:replace(Input, "\\r?\\n$", "") of
-	[Output, []] ->
-	    Output;
-	_ ->
-	    list_to_binary(Input)
-    end.
 
 handle(Socket, RawData, User) ->
     case RawData of
 	?BLANK ->
 	    User;
 	_ ->
-	    CleanData=clean_newline(RawData),
+	    [CleanData, []] = re:replace(RawData, "\\r?\\n$", ""),
 	    case re:split(CleanData, "\\:\\s*") of 
 		[?CONNECT, Name] ->
 		    connect(Socket, User, Name);

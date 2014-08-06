@@ -1,6 +1,5 @@
 < short >
 
-broadcast to other users on connection, deletion
 private, public messages
 
 testing
