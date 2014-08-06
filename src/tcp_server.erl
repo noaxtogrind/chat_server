@@ -17,7 +17,7 @@ start_link(LSock, Mod) ->
     gen_server:start_link(?MODULE, [LSock, Mod], []).
 
 init([LSock, Mod]) ->
-    io:format("Initialising ~p~n", [self()]),
+    io:format("Initialising tcp_server ~p~n", [self()]),
     erlang:send_after(0, self(), trigger),
     {ok, #state{lsock = LSock, mod = Mod}}.
 
