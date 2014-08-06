@@ -1,5 +1,7 @@
 -module(chat_controller).
 
+-include("chat.hrl").
+
 -export([handle/3]).
 
 -define(BLANK, "\r\n").
@@ -16,21 +18,24 @@ clean_newline(Input) ->
 	    list_to_binary(Input)
     end.
 
-handle(Socket, RawData, Args) ->
+handle(Socket, RawData, User) ->
     case RawData of
 	?BLANK ->
-	    Args;
+	    User;
 	_ ->
 	    CleanData=clean_newline(RawData),
 	    case re:split(CleanData, "\\:\\s*") of 
 		[?CONNECT, Name] ->
 		    Resp=io_lib:fwrite("Connected as ~p~n", [binary_to_list(Name)]),
-		    gen_tcp:send(Socket, Resp);
+		    gen_tcp:send(Socket, Resp),
+		    User#user{name=Name};
 		[?QUIT] ->
 		    Resp="Quit!\n",
-		    gen_tcp:send(Socket, Resp);
+		    gen_tcp:send(Socket, Resp),
+		    User#user{name=null};
 		_ ->
 		    Resp="Unknown :-(\n",
-		    gen_tcp:send(Socket, Resp)
+		    gen_tcp:send(Socket, Resp),
+		    User
 	    end
     end.

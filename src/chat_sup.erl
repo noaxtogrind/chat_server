@@ -4,7 +4,6 @@
 
 -behaviour(supervisor).
 
-
 -export([start_link/1]).
 
 -export([init/1]).
@@ -14,7 +13,7 @@
 -define(TCP_CONTROLLER, chat_controller).
 
 start_link(Port) ->
-    supervisor:start_link({local, ?SERVER}, ?MODULE, [Port, ?TCP_CONTROLLER, #user{}]).
+    supervisor:start_link({local, ?SERVER}, ?MODULE, [Port, ?TCP_CONTROLLER, #user{name=null}]).
 
 init([Port, Mod, Args]) ->
     NameServer = {name_server, {name_server, start_link, []},
