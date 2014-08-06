@@ -26,16 +26,31 @@ handle(Socket, RawData, User) ->
 	    CleanData=clean_newline(RawData),
 	    case re:split(CleanData, "\\:\\s*") of 
 		[?CONNECT, Name] ->
-		    Resp=io_lib:fwrite("Connected as ~p~n", [binary_to_list(Name)]),
-		    gen_tcp:send(Socket, Resp),
-		    User#user{name=Name};
+		    case name_server:add(Name, Socket) of
+			ok ->
+			    gen_tcp:send(Socket, "Connected\n"),
+			    User#user{name=Name};
+			{error, ErrMsg} ->
+			    gen_tcp:send(Socket, ErrMsg++"\n"),
+			    User
+		    end;
 		[?QUIT] ->
-		    Resp="Quit!\n",
-		    gen_tcp:send(Socket, Resp),
-		    User#user{name=null};
+		    case User#user.name of
+			null ->
+			    gen_tcp:send(Socket, "Not connected\n"),
+			    User;
+			Name ->
+			    case name_server:remove(Name) of
+				ok ->
+				    gen_tcp:send(Socket, "Disconnected\n"),
+				    User#user{name=null};
+				{error, ErrMsg} ->
+				    gen_tcp:send(Socket, ErrMsg++"\n"),
+				    User    
+			    end
+		    end;
 		_ ->
-		    Resp="Unknown :-(\n",
-		    gen_tcp:send(Socket, Resp),
+		    gen_tcp:send(Socket, "Unhandled\n"),
 		    User
 	    end
     end.

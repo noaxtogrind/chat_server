@@ -1,6 +1,8 @@
 < short >
 
-controller to return newargs
+include null, blank in headers
+
+complete chatting protocols
 
 testing
 rebar

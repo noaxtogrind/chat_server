@@ -32,21 +32,21 @@ handle_info({tcp, Socket, RawData},  #state{mod = Mod, args = Args} = State) ->
     inet:setopts(Socket, [{active, once}]), 
     NewArgs = Mod:handle(Socket, RawData, Args),
     {noreply, State#state{args = NewArgs}};
-handle_info({tcp_closed, Socket}, State) ->
-    io:format("~p closed~n", [Socket]),
+handle_info({tcp_closed, _Socket}, State) ->
+    %% io:format("~p closed~n", [Socket]),
     {stop, normal, State};
-handle_info({tcp_error, Socket}, State) ->
-    io:format("~p error; closing~n", [Socket]),
+handle_info({tcp_error, _Socket}, State) ->
+    %% io:format("~p error; closing~n", [Socket]),
     {stop, normal, State};
 handle_info(trigger, #state{lsock = LSock} = State) ->
     {ok, Socket} = gen_tcp:accept(LSock),
     inet:setopts(Socket, [{active, once}]),
-    io:format("~p accepted~n", [Socket]),
+    %% io:format("~p accepted~n", [Socket]),
     tcp_sup:start_child(),
     {noreply, State}.
 
 terminate(_Reason, _State) ->
-    io:format("~p terminated~n", [self()]),
+    %% io:format("~p terminated~n", [self()]),
     ok.
 
 code_change(_OldVsn, State, _Extra) ->
