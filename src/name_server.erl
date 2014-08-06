@@ -8,6 +8,7 @@
 
 -export([add/2,
 	 remove/1,
+	 lookup/1,
 	 list/0]).
 
 %% gen_server callbacks
@@ -23,8 +24,11 @@
 
 %% API
 
-add(Name, Pid) ->
-    gen_server:call(?SERVER, {add, Name, Pid}).
+add(Name, Socket) ->
+    gen_server:call(?SERVER, {add, Name, Socket}).
+
+lookup(Name) ->
+    gen_server:call(?SERVER, {lookup, Name}).
 
 remove(Name) ->
     gen_server:call(?SERVER, {remove, Name}).
@@ -44,14 +48,22 @@ init([]) ->
     Users = dict:new(),
     {ok, Users}.
 
-handle_call({add, Name, Pid}, _From, Users) ->
+handle_call({add, Name, Socket}, _From, Users) ->
     {Reply, NewUsers} = case dict:is_key(Name, Users) of
 			    false ->
-				{ok, dict:append(Name, Pid, Users)};
+				{ok, dict:append(Name, Socket, Users)};
 			    true ->
 				{{error, "Name exists"}, Users}
 			end,
     {reply, Reply, NewUsers};
+handle_call({lookup, Name}, _From, Users) ->
+    Reply=case dict:find(Name, Users) of
+	      {ok, [Socket]} ->
+		  {ok, Socket};
+	      error ->
+		  {error, "Name not found"}
+	  end,
+    {reply, Reply, Users};
 handle_call({remove, Name}, _From, Users) ->
     {Reply, NewUsers} = case dict:is_key(Name, Users) of
 			    true ->
