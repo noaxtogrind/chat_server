@@ -39,7 +39,8 @@ handle_call(_Request, _From, Users) ->
     {reply, Reply, Users}.
 
 handle_cast(speak, Users) ->
-    io:format("Hello World from name_server!~n"),
+    %% io:format("Hello World from name_server!~n"),
+    io:format("~p~n", [dict:to_list(Users)]),
     {noreply, Users}.
 
 handle_info(_Info, Users) ->
