@@ -1,6 +1,9 @@
 -module(chat_sup).
 
+-include("chat.hrl").
+
 -behaviour(supervisor).
+
 
 -export([start_link/1]).
 
@@ -10,10 +13,8 @@
 
 -define(TCP_CONTROLLER, chat_controller).
 
--define(TCP_ARGS, {}).
-
 start_link(Port) ->
-    supervisor:start_link({local, ?SERVER}, ?MODULE, [Port, ?TCP_CONTROLLER, ?TCP_ARGS]).
+    supervisor:start_link({local, ?SERVER}, ?MODULE, [Port, ?TCP_CONTROLLER, #user{}]).
 
 init([Port, Mod, Args]) ->
     NameServer = {name_server, {name_server, start_link, []},
