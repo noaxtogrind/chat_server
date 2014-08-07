@@ -8,6 +8,8 @@
 
 -define(SAY, <<"SAY">>).
 
+-define(PRIV, <<"PRIV">>).
+
 -define(QUIT, <<"QUIT">>).
 
 send(Socket, Msg) ->
@@ -42,6 +44,22 @@ say(Socket, User, Msg) ->
 	    User
     end.
 
+priv(FromSocket, User, ToName, Msg) ->
+    case User#user.name of
+	?NULL ->
+	    send(FromSocket, "Not connected"),
+	    User;
+	FromName ->
+	    case name_server:lookup(ToName) of
+		{ok, ToSocket}->
+		    send(ToSocket, io_lib:fwrite("~p says ~p", [binary_to_list(FromName), binary_to_list(Msg)])),
+		    User;
+		{error, ErrMsg} ->
+		    send(FromSocket, ErrMsg),
+		    User    
+	    end
+    end.
+
 quit(Socket, User) ->
     case User#user.name of
 	?NULL ->
@@ -70,6 +88,8 @@ handle(Socket, RawData, User) ->
 		    connect(Socket, User, Name);
 		[?SAY, Msg] ->
 		    say(Socket, User, Msg);
+		[?PRIV, ToName, Msg] ->
+		    priv(Socket, User, ToName, Msg);
 		[?QUIT] ->
 		    quit(Socket, User);
 		_ ->
